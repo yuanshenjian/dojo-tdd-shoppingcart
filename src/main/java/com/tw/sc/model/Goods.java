@@ -1,16 +1,21 @@
 package com.tw.sc.model;
 
 public abstract class Goods {
+    public enum Category {
+        FOOD, COMMODITY, ALCOHOL, ELECTRON, UNKNOW
+    }
+
     private String name;
     private double price;
     private Discount discount;
+    private Category category;
 
-    public Goods(String name, double price) {
+    public Goods(Category category, String name, double price) {
+        this.category = category;
         this.name = name;
         this.price = price;
     }
 
-    public abstract double countDiscountedPrice();
 
     public String getName() {
         return name;
@@ -45,7 +50,31 @@ public abstract class Goods {
                 '}';
     }
 
-    public enum Category {
-        ELEC
+    public double calculateDiscountedPrice() {
+        Discount discount = getDiscount();
+        boolean hasAvailableDiscount = (discount != null && discount.available() && discount.getCategory() == category);
+        if (hasAvailableDiscount) {
+            return getPrice() * discount.getRate();
+        }
+        return getPrice() * 1;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        ;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Goods goods = (Goods) o;
+        return name.equals(goods.name);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }
