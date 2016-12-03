@@ -14,7 +14,6 @@ public class ShoppingCar {
     private Discount discount;
 
     private ShoppingCar() {
-
     }
 
     public static ShoppingCar getInstance() {
@@ -25,15 +24,18 @@ public class ShoppingCar {
         this.coupon = coupon;
     }
 
-    public Coupon getCoupon() {
-        return coupon;
-    }
-
     public double tally() {
-        double result = 0.0;
+        double result = calculateAllItemsPrice();
+        boolean isCouponAvailable = (coupon != null
+                && coupon.available()
+                && result >= coupon.getMinConsumption());
+        if (isCouponAvailable) {
+            result = result - coupon.getValue();
+        }
         clear();
         return result;
     }
+
 
     public void addGoods(Goods goods) {
         addGoods(goods, 1);

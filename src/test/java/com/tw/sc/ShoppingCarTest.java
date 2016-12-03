@@ -6,10 +6,14 @@ import com.tw.sc.model.Discount;
 import com.tw.sc.model.Goods;
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ShoppingCarTest {
     private static ShoppingCar shoppingCar;
@@ -61,20 +65,20 @@ public class ShoppingCarTest {
         goods = GoodsFactory.create(Goods.Category.COMMODITY, "toothset", 5.0);
         shoppingCar.addGoods(goods, 10);
 
-        assertEquals(shoppingCar.calculateAllItemsPrice(), 2699.0, 0);
+        assertEquals(2699.0, shoppingCar.calculateAllItemsPrice(), 0);
     }
 
 
-    @Ignore
     @Test
     public void should_calculate_final_price_when_coupon_deadline_not_set() {
-        Goods goods = GoodsFactory.create(Goods.Category.ELECTRON, "ipad", 2399.0);
-        shoppingCar.addGoods(goods);
         double value = 100.0;
         double minConsumption = 300.0;
-//        when(shoppingCar.calculateAllItemsPrice()).thenReturn(500);
         Coupon coupon = new Coupon(value, minConsumption);
-        shoppingCar.setCoupon(coupon);
-        assertEquals(400, shoppingCar.tally(), 0);
+
+        ShoppingCar shoppingCarSpy = spy(shoppingCar);
+        shoppingCarSpy.setCoupon(coupon);
+        when(shoppingCarSpy.calculateAllItemsPrice()).thenReturn(500.0);
+        assertEquals(400, shoppingCarSpy.tally(), 0);
+        verify(shoppingCarSpy).calculateAllItemsPrice();
     }
 }

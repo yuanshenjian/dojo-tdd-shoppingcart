@@ -1,8 +1,11 @@
 package com.tw.sc.model;
 
+import java.time.LocalDate;
+
 public class Coupon {
     private double value;
     private double minConsumption;
+    private LocalDate deadline;
 
     public Coupon(double value, double minConsumption) {
         this.value = value;
@@ -13,23 +16,19 @@ public class Coupon {
         return value;
     }
 
-    public void setValue(double value) {
-        this.value = value;
-    }
-
     public double getMinConsumption() {
         return minConsumption;
     }
 
-    public void setMinConsumption(double minConsumption) {
-        this.minConsumption = minConsumption;
+    public boolean available() {
+        if (deadline == null){
+            return true;
+        }
+        LocalDate now = LocalDate.now();
+        return deadline.isAfter(now) || deadline.equals(now);
     }
 
-    @Override
-    public String toString() {
-        return "Coupon{" +
-                "value=" + value +
-                ", minConsumption=" + minConsumption +
-                '}';
+    public void setDeadline(LocalDate deadline) {
+        this.deadline = deadline;
     }
 }
