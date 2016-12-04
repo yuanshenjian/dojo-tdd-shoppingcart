@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class ShoppingCar {
     private final static ShoppingCar INSTANCE = new ShoppingCar();
-    private static final Map<Goods, Integer> ORDER_LIST = new HashMap<Goods, Integer>();
+    private static final Map<Goods, Integer> ORDER_LIST = new HashMap<>();
     private Coupon coupon;
     private Discount discount;
 
@@ -36,7 +36,6 @@ public class ShoppingCar {
         return result;
     }
 
-
     public void addGoods(Goods goods) {
         addGoods(goods, 1);
     }
@@ -54,11 +53,7 @@ public class ShoppingCar {
     }
 
     public int sumAllItems() {
-        int sum = 0;
-        for (Map.Entry<Goods, Integer> goodsIntegerEntry : ORDER_LIST.entrySet()) {
-            sum += goodsIntegerEntry.getValue();
-        }
-        return sum;
+        return ORDER_LIST.entrySet().stream().mapToInt(Map.Entry::getValue).sum();
     }
 
     public void clear() {
@@ -66,13 +61,11 @@ public class ShoppingCar {
     }
 
     public double calculateAllItemsPrice() {
-        double sum = 0.0;
-        for (Map.Entry<Goods, Integer> goodsEntry : ORDER_LIST.entrySet()) {
+        return ORDER_LIST.entrySet().stream().mapToDouble(goodsEntry -> {
             Goods goods = goodsEntry.getKey();
             goods.setDiscount(discount);
-            sum += goods.calculateDiscountedPrice() * goodsEntry.getValue();
-        }
-        return sum;
+            return goods.calculateDiscountedPrice() * goodsEntry.getValue();
+        }).sum();
     }
 
     public void setDiscount(Discount discount) {

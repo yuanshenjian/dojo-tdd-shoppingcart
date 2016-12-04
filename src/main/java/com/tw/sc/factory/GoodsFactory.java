@@ -1,6 +1,6 @@
 package com.tw.sc.factory;
 
-import com.tw.sc.exception.InvalidGoodsCatgoryException;
+import com.tw.sc.exception.InvalidGoodsCategoryException;
 import com.tw.sc.model.*;
 
 public class GoodsFactory {
@@ -15,6 +15,6 @@ public class GoodsFactory {
             case ALCOHOL:
                 return new Alcohol(name, price);
         }
-        throw new InvalidGoodsCatgoryException();
+        throw new InvalidGoodsCategoryException();
     }
 }

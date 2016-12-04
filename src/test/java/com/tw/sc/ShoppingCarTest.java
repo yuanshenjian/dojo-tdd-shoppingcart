@@ -7,13 +7,9 @@ import com.tw.sc.model.Goods;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ShoppingCarTest {
     private static ShoppingCar shoppingCar;
@@ -21,14 +17,12 @@ public class ShoppingCarTest {
     @BeforeClass
     public static void setup() {
         shoppingCar = ShoppingCar.getInstance();
-
     }
 
     @After
     public void tearDown() {
         shoppingCar.clear();
     }
-
 
     @Test
     public void should_add_goods_to_shopping_car() {
@@ -68,7 +62,6 @@ public class ShoppingCarTest {
         assertEquals(2699.0, shoppingCar.calculateAllItemsPrice(), 0);
     }
 
-
     @Test
     public void should_calculate_final_price_when_coupon_deadline_not_set() {
         double value = 100.0;
@@ -78,6 +71,7 @@ public class ShoppingCarTest {
         ShoppingCar shoppingCarSpy = spy(shoppingCar);
         shoppingCarSpy.setCoupon(coupon);
         when(shoppingCarSpy.calculateAllItemsPrice()).thenReturn(500.0);
+
         assertEquals(400, shoppingCarSpy.tally(), 0);
         verify(shoppingCarSpy).calculateAllItemsPrice();
     }

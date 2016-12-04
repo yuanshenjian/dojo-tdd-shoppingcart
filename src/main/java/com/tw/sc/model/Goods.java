@@ -2,7 +2,7 @@ package com.tw.sc.model;
 
 public abstract class Goods {
     public enum Category {
-        FOOD, COMMODITY, ALCOHOL, ELECTRON, UNKNOW
+        FOOD, COMMODITY, ALCOHOL, ELECTRON, UNKNOWN
     }
 
     private String name;
@@ -16,21 +16,17 @@ public abstract class Goods {
         this.price = price;
     }
 
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public double calculateDiscountedPrice() {
+        Discount discount = getDiscount();
+        boolean hasAvailableDiscount = (discount != null && discount.available() && discount.getCategory() == category);
+        if (hasAvailableDiscount) {
+            return getPrice() * discount.getRate();
+        }
+        return getPrice() * 1;
     }
 
     public double getPrice() {
         return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
     }
 
     public Discount getDiscount() {
@@ -42,29 +38,10 @@ public abstract class Goods {
     }
 
     @Override
-    public String toString() {
-        return "Goods{" +
-                "name='" + name + '\'' +
-                ", price=" + price +
-                ", discount=" + discount +
-                '}';
-    }
-
-    public double calculateDiscountedPrice() {
-        Discount discount = getDiscount();
-        boolean hasAvailableDiscount = (discount != null && discount.available() && discount.getCategory() == category);
-        if (hasAvailableDiscount) {
-            return getPrice() * discount.getRate();
-        }
-        return getPrice() * 1;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        ;
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
@@ -77,4 +54,15 @@ public abstract class Goods {
     public int hashCode() {
         return name.hashCode();
     }
+
+
+    @Override
+    public String toString() {
+        return "Goods{" +
+                "name='" + name + '\'' +
+                ", price=" + price +
+                ", discount=" + discount +
+                '}';
+    }
+
 }
