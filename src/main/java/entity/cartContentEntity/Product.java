@@ -27,5 +27,4 @@ public class Product extends CartContent {
     public Enum getDiscountType() {
         return productType;
     }
-
 }
