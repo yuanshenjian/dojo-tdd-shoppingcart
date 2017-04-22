@@ -33,13 +33,13 @@ public enum ProductType {
     }
 
     public static Enum getProductType(String p) {
-        for (Enum e : types.keySet()) {
-            for (String i : types.get(e)) {
-                if (i.equals(p)) return e;
-            }
-        }
-        return null;
-
+      Optional result = types.keySet().stream()
+              .filter(key-> Arrays.stream(types.get(key))
+                      .filter(i->i.equals(p)).findAny()
+                      .isPresent()
+                    )
+              .findAny();
+      return  result.isPresent()?(ProductType)result.get():null;
     }
 
     public static ProductType getProductTypeByName(String p) {
