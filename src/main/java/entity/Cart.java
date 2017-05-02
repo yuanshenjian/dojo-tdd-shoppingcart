@@ -54,10 +54,9 @@ public class Cart {
     }
 
     private void getAmount() {
-        for (Coupon c : coupons) {
-            if (is_Effective_Coupon(c))
-                totalAmount= totalAmount.subtract(c.getAbatement());
-        }
+        coupons.stream()
+                .filter(c->is_Effective_Coupon(c))
+                .forEach(c->totalAmount= totalAmount.subtract(c.getAbatement()));
     }
 
     private boolean is_Effective_Coupon(Coupon c) {
