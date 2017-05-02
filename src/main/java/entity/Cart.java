@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class Cart {
 
@@ -21,6 +22,11 @@ public class Cart {
     private BigDecimal totalAmount = new BigDecimal(0);
     private Date balanceDate;
     private final BigDecimal defaultDiscount = new BigDecimal(1);
+    private final Predicate<Coupon> is_coupon = c->c.getEffectiveDate().getTime() >=
+            this.balanceDate.getTime() && totalAmount.compareTo(c.getQuota()) >= 0;
+    private Predicate<String> couponTest = i->InputType.COUPON.equals(Input.getInputType(i));
+    private Predicate<String> discountTest = i->InputType.DISCOUNT.equals(Input.getInputType(i));
+    private Predicate<String> productTest = i->InputType.PRODUCT.equals(Input.getInputType(i));
 
     public Cart(List<String> info) throws ParseException {
         for (String i : info) {
@@ -35,20 +41,17 @@ public class Cart {
     }
 
     private void getDiscountedAmount() {
-        for (Product p : products) {
-          //  double discount = getDiscount(p);
-            totalAmount = totalAmount.add(p.getTotalPrice().multiply(getDiscount(p)));
-            //totalAmount += p.getTotalPrice().doubleValue() * discount;
-        }
+        products.stream().forEach(p->totalAmount = totalAmount.add(p.getTotalPrice().multiply(getDiscount(p))));
+
     }
 
     private BigDecimal getDiscount(Product p) {
-        for (Discount d : discounts) {
-            if (is_Effective_Discount(p, d)) {
-                return defaultDiscount.multiply(d.getDiscount());
-            }
-        }
-        return defaultDiscount;
+       return discounts
+               .stream()
+               .filter(d->is_Effective_Discount(p,d))
+               .findAny()
+               .map(s->defaultDiscount.multiply(s.getDiscount()))
+               .orElse(defaultDiscount);
     }
 
     private boolean is_Effective_Discount(Product p, Discount d) {
@@ -57,42 +60,41 @@ public class Cart {
     }
 
     private void getAmount() {
-        for (Coupon c : coupons) {
-            if (is_Effective_Coupon(c))
-               // totalAmount -= c.getAbatement();
-                totalAmount= totalAmount.subtract(c.getAbatement());
-        }
+        coupons.stream()
+                .filter(is_coupon)
+                .forEach(c->totalAmount= totalAmount.subtract(c.getAbatement()));
     }
 
-    private boolean is_Effective_Coupon(Coupon c) {
-        return c.getEffectiveDate().getTime() >= this.balanceDate.getTime() && totalAmount.compareTo(c.getQuota()) >= 0;
-    }
 
     private Cart addCartContent(String input) throws ParseException {
+        Action action = getAction(input);
         if (input == null) return null;
-        if (InputType.COUPON.equals(Input.getInputType(input))) {
-            addCoupon(input);
+        if (couponTest.test(input)) {
+            action.addItem(input);
         }
-        if (InputType.DISCOUNT.equals(Input.getInputType(input)))
-            addDiscount(input);
+        if (discountTest.test(input))
+            action.addItem(input);
 
-        if (InputType.PRODUCT.equals(Input.getInputType(input)))
-            addProduct(input);
+        if (productTest.test(input))
+            action.addItem(input);
         return this;
     }
 
-    private void addProduct(String input) throws ParseException {
-        products.add((Product) CartContentFactory.createCartContent(input));
-    }
+    private Action getAction(String input) {
 
-    private void addDiscount(String input) throws ParseException {
-        discounts.add((Discount) CartContentFactory.createCartContent(input));
-    }
-
-    private void addCoupon(String input) throws ParseException {
-        if (coupons.size() == 0) {//only one coupon can be used
-            coupons.add((Coupon) CartContentFactory.createCartContent(input));
+        Action action = null;
+        if (couponTest.test(input)) {
+            action = (i)->{
+                if (coupons.size() == 0) {//only one coupon can be used
+                    coupons.add((Coupon) CartContentFactory.createCartContent(i));
+                }};
         }
+        if (discountTest.test(input))
+            action = (i)->discounts.add((Discount) CartContentFactory.createCartContent(i));
+
+        if (productTest.test(input))
+            action=(i)->products.add((Product) CartContentFactory.createCartContent(i));
+        return action;
     }
 
     private Cart addBalanceDate(String p) throws ParseException {
@@ -102,4 +104,8 @@ public class Cart {
         return this;
     }
 
+}
+
+interface Action{
+    void addItem(String input) throws ParseException;
 }
