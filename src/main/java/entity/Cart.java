@@ -40,12 +40,12 @@ public class Cart {
     }
 
     private BigDecimal getDiscount(Product p) {
-        for (Discount d : discounts) {
-            if (is_Effective_Discount(p, d)) {
-                return defaultDiscount.multiply(d.getDiscount());
-            }
-        }
-        return defaultDiscount;
+       return discounts
+               .stream()
+               .filter(d->is_Effective_Discount(p, d))
+               .findAny()
+               .map(s->defaultDiscount.multiply(s.getDiscount()))
+               .orElse(defaultDiscount);
     }
 
     private boolean is_Effective_Discount(Product p, Discount d) {
