@@ -35,11 +35,8 @@ public class Cart {
     }
 
     private void getDiscountedAmount() {
-        for (Product p : products) {
-          //  double discount = getDiscount(p);
-            totalAmount = totalAmount.add(p.getTotalPrice().multiply(getDiscount(p)));
-            //totalAmount += p.getTotalPrice().doubleValue() * discount;
-        }
+        products.stream().forEach(p->totalAmount = totalAmount.add(p.getTotalPrice().multiply(getDiscount(p))));
+
     }
 
     private BigDecimal getDiscount(Product p) {
