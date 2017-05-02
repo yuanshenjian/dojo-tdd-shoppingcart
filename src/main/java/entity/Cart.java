@@ -56,7 +56,6 @@ public class Cart {
     private void getAmount() {
         for (Coupon c : coupons) {
             if (is_Effective_Coupon(c))
-               // totalAmount -= c.getAbatement();
                 totalAmount= totalAmount.subtract(c.getAbatement());
         }
     }
